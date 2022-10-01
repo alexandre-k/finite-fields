@@ -7,7 +7,7 @@ class Point:
         self.b = b
         if x is None and y is None:
             return
-        if y**2 != x**3 + a * x +b:
+        if y**2 != x**3 + a * x + b:
             raise ValueError(f'({x}, {y}) are not on the curve.')
 
     def __eq__(self, other):
@@ -27,7 +27,20 @@ class Point:
             return self.__class__(None, None, self.a, self.b)
         if self.x != other.x:
             slope = (other.y - self.y) / (other.x - self.x)
-            x = slope**2 - self.x - other.x
+            x = slope * slope - self.x - other.x
             y = slope * (self.x - x) - self.y
             return self.__class__(x, y, self.a, self.b)
+        if self.x == other.x and self.y == other.y:
+            slope = (3 * self.x**2 + self.a) / (2 * self.y)
+            x = slope * slope - 2 * self.x
+            y = slope * (self.x - x) - self.y
+            return self.__class__(x, y, self.a, self.b)
+        if self == other and self.y == 0 * self.x:
+            return self.__class__(None, None, self.a, self.b)
         return
+
+    def __rmul__(self, coef):
+        product = self.__class__(None, None, self.a, self.b)
+        for _ in range(coef):
+            product += self
+        return product

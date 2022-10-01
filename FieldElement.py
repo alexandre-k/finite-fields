@@ -23,10 +23,12 @@ class FieldElement:
     def __sub__(self, other):
         return self.__class__((self.num - other.num) % self.prime, self.prime)
 
-    def __mul__(self, multiplicator):
-        if isinstance(multiplicator, int):
-            return self.__class__((self.num * multiplicator) % self.prime, self.prime)
-        return self.__class__((self.num * multiplicator.num) % self.prime, self.prime)
+    def __mul__(self, other):
+        self._check_other(other)
+        return self.__class__((self.num * other.num) % self.prime, self.prime)
+
+    def __rmul__(self, coef):
+        return self.__class__(num=(self.num * coef) % self.prime, prime=self.prime)
 
     def __pow__(self, exponent):
         if not isinstance(exponent, int):
@@ -36,10 +38,10 @@ class FieldElement:
         return self.__class__((num) % self.prime, self.prime)
 
     def __truediv__(self, other):
-        self.check_other(other)
+        self._check_other(other)
         return self.__class__(self.num * (other.num**(other.prime - 2)) % self.prime, self.prime)
 
-    def check_other(self, other):
+    def _check_other(self, other):
         if self.prime != other.prime:
             raise TypeError('Cannot add 2 numbers in different Fields.')
 

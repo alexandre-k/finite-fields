@@ -31,3 +31,10 @@ def test_point_x1_diff_x2():
     p3 = p1 + p2
     assert p3.x == 3.0
     assert p3.y == -7.0
+
+def test_point_x1_eq_x2():
+    p1 = Point(-1, -1, a, b)
+    p2 = Point(-1, -1, a, b)
+    p3 = p1 + p2
+    assert p3.x == 18.0
+    assert p3.y == 77.0
