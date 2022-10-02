@@ -46,7 +46,7 @@ class FieldElement:
             raise TypeError('Cannot add 2 numbers in different Fields.')
 
 
-primes = [7, 11, 17, 31]
+# primes = [7, 11, 17, 31]
 
-for p in primes:
-    print([pow(s, p-1, p) % p for s in range(1, p)])
+# for p in primes:
+#     print([pow(s, p-1, p) % p for s in range(1, p)])
