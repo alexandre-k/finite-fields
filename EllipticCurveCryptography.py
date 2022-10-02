@@ -2,6 +2,7 @@ from FieldElement import FieldElement
 from EllipticCurve import Point
 from random import randint
 from hashlib import sha256
+from helpers import hash160, encode_base58_checksum
 
 Gx = 0x79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798
 Gy = 0x483ada7726a3c4655da4fbfc0e1108a8fd17b448a68554199c47d08ffb10d4b8
@@ -78,6 +79,16 @@ class S256Point(Point):
         else:
             return S256Point(x, odd_beta)
 
+    def hash160(self, compressed=True):
+        return hash160(self.sec(compressed))
+
+    def address(self, compressed=True, testnet=False):
+        h160 = self.hash160(compressed)
+        if testnet:
+            prefix = b'\x6f'
+        else:
+            prefix = b'\x00'
+        return encode_base58_checksum(prefix + h160)
 
 G = S256Point(Gx, Gy)
 
@@ -90,6 +101,19 @@ class Signature:
 
     def __repr__(self):
         return 'Signature(:{x},{:x})'.format(self.r, self.s)
+
+    def der(self):
+        rbin = self.r.to_bytes(32, 'big')
+        rbin = rbin.lstrip(b'\x00')
+        # check high 1 or 0
+        if rbin[0] & 0x80:
+            rbin = b'\x00' + rbin
+        result = bytes([2, len(rbin)]) + rbin
+        sbin = self.s.to_bytes(32, 'big')
+        if sbin[0] & 0x80:
+            sbin = b'\x00' + sbin
+        result += bytes([2, len(sbin)]) + sbin
+        return bytes([0x30, len(result)]) + result
 
 class PrivateKey:
 
@@ -129,6 +153,14 @@ class PrivateKey:
                 return candidate
             k = hmac.new(k, v + b'\x00', s256).digest()
             v = hmac.new(k, v, s256).digest()
+
+    def wif(self, compressed=True, testnet=False):
+        secret_bytes = self.secret.to_bytes(32, 'big')
+        prefix = b'\xef ' if testnet else b'\x80'
+        suffix = b'\x01' if compressed else b'\x01'
+        return encode_base58_checksum(prefix + secret_bytes + suffix)
+
+
 
 
 

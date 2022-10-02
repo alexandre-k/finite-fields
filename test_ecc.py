@@ -1,5 +1,11 @@
 import pytest
-from EllipticCurveCryptography import S256Point, N, G, doubleSHA256, PrivateKey
+from EllipticCurveCryptography import (
+    S256Point,
+    N,
+    G,
+    doubleSHA256,
+    PrivateKey,
+    Signature)
 from EllipticCurve import Point
 from FieldElement import FieldElement
 
@@ -121,4 +127,18 @@ def test_sec():
     assert private_key.point.parse(x).y.num == expected_y
 
 def test_der():
-    pass
+    r = 0x37206a0610995c58074999cb9767b87af4c4978db68c06e8e6e81d282047a7c6
+    s = 0x8ca63759c1157ebeaec0d03cecca119fc9a75bf8e6d0fa65c841c8e2738cdaec
+    sig = Signature(r, s)
+    assert sig.der().hex() == '3045022037206a0610995c58074999cb9767b87af4c4978db68c06e8e6e81d282047a7c60221008ca63759c1157ebeaec0d03cecca119fc9a75bf8e6d0fa65c841c8e2738cdaec'
+
+def test_address():
+    assert PrivateKey(5000).point.address() == '15A8MkDwDQg7BnD6iqMFeeSAM3VVoNMKnp'
+    assert PrivateKey(2020**5).point.address() == '19JYTuj9fg6aeS7apjuDpJoN9g7Y6kYwXZ'
+    assert PrivateKey(0x12345deadbeef).point.address() == '1F1Pn2y6pDb68E5nYJJeba4TLg2U9QHEgK'
+
+def test_wif():
+    assert PrivateKey(5000).wif() == 'KwDiBf89QgGbjEhKnhXJuH7LrciVrZi3qYjgd9M7rFUqyEBAPBYN'
+    assert PrivateKey(2020**5).wif() == 'KwDiBf89QgGbjEhKnhXJuH7LrciVrZi3qYjisvWR8hVo4BoghwjX'
+    assert PrivateKey(0x12345deadbeef).wif() == 'KwDiBf89QgGbjEhKnhXJuH7LrciVrZi3qYjgePaN7fzA6Jqng6EW'
+
