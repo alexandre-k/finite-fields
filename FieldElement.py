@@ -39,7 +39,7 @@ class FieldElement:
 
     def __truediv__(self, other):
         self._check_other(other)
-        return self.__class__(self.num * (other.num**(other.prime - 2)) % self.prime, self.prime)
+        return self.__class__(self.num * pow(other.num, self.prime - 2, self.prime) % self.prime, self.prime)
 
     def _check_other(self, other):
         if self.prime != other.prime:

@@ -40,7 +40,16 @@ class Point:
         return
 
     def __rmul__(self, coef):
-        product = self.__class__(None, None, self.a, self.b)
-        for _ in range(coef):
-            product += self
-        return product
+        current = self
+        # product = self.__class__(None, None, self.a, self.b)
+        result = self.__class__(None, None, self.a, self.b)
+        while coef:
+            # binary expansion
+            if coef & 1:
+                result += current
+            current += current
+            coef >>= 1
+        # for _ in range(coef):
+            # product += self
+        # return product
+        return result

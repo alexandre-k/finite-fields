@@ -1,4 +1,5 @@
 import pytest
+from EllipticCurveCryptography import S256Point, N, G, doubleSHA256, PrivateKey
 from EllipticCurve import Point
 from FieldElement import FieldElement
 
@@ -83,3 +84,41 @@ def test_group_order_infinity():
     result = 7 * p
     assert result.x == None
     assert result.y == None
+
+# def test_s256_point():
+#     # private key
+#     e = int.from_bytes(doubleSHA256(b'secret'), 'big')
+#     z = int.from_bytes(doubleSHA256(b'message'), 'big')
+#     k = 1234567890
+#     r = (k*G).x.num
+#     k_inv = pow(k, N-2, N)
+#     s = (z+r*e) * k_inv % N
+#     point = e*G
+#     # TODO
+#     assert point == ""
+#     assert hex(z) == ""
+#     assert hex(e) == ""
+#     assert hex(s) == ""
+
+def test_sec():
+    private_key = PrivateKey(5000)
+    assert private_key.secret == 5000
+    assert private_key.point.x.num == 0xffe558e388852f0120e46af2d1b370f85854a8eb0841811ece0e3e03d282d57c
+    assert private_key.point.y.num == 0x315dc72890a4f10a1481c031b03b351b0dc79901ca18a00cf009dbdb157a1d10
+    assert private_key.point.sec(compressed=False).hex() == '04ffe558e388852f0120e46af2d1b370f85854a8eb0841811ece0e3e03d282d57c315dc72890a4f10a1481c031b03b351b0dc79901ca18a00cf009dbdb157a1d10'
+
+    private_key = PrivateKey(0xdeadbeef12345)
+    assert private_key.point.sec(compressed=False).hex() == '04d90cd625ee87dd38656dd95cf79f65f60f7273b67d3096e68bd81e4f5342691f842efa762fd59961d0e99803c61edba8b3e3f7dc3a341836f97733aebf987121'
+
+    private_key = PrivateKey(2018**5)
+    expected_y = private_key.point.y.num
+    assert private_key.point.sec(compressed=False).hex() == '04027f3da1918455e03c46f659266a1bb5204e959db7364d2f473bdf8f0a13cc9dff87647fd023c13b4a4994f17691895806e1b40b57f4fd22581a4f46851f3b06'
+
+    assert len(private_key.point.sec(compressed=False).hex()) == 130
+    assert len(private_key.point.sec().hex()) == 66
+    assert private_key.point.sec().hex() == '02027f3da1918455e03c46f659266a1bb5204e959db7364d2f473bdf8f0a13cc9d'
+    x = bytes.fromhex('02027f3da1918455e03c46f659266a1bb5204e959db7364d2f473bdf8f0a13cc9d')
+    assert private_key.point.parse(x).y.num == expected_y
+
+def test_der():
+    pass
